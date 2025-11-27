@@ -8,7 +8,8 @@ class Model(nn.Module):
         """ FeatureExtraction """
         self.FeatureExtraction = VGG_FeatureExtractor(input_channel, output_channel)
         self.FeatureExtraction_output = output_channel
-        self.AdaptiveAvgPool = nn.AdaptiveAvgPool2d((None, 1))
+        self.AdaptiveAvgPool = nn.AvgPool2d((1, 3))  # Transform final (imgH/16-1) -> 1
+                                                     # Assuming imgH=64
 
         """ Sequence modeling"""
         self.SequenceModeling = nn.Sequential(
