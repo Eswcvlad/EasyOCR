@@ -62,22 +62,6 @@ def main():
     parser.add_argument('model_dir', help='directory with EasyOCR models')
     model_dir = parser.parse_args().model_dir
 
-    print('Exporting CRAFT...')
-    filename: str = config.detection_models['craft']['filename']
-    dummy_input = (torch.randn(1, 3, 2560, 2560),)
-    model = get_detector(os.path.join(model_dir, filename))
-    torch.onnx.export(
-        model,
-        dummy_input,
-        os.path.join(model_dir, filename.rsplit('.', 1)[0] + '.onnx'),
-        export_params=True,
-        input_names=('images',),
-        output_names=('y',),
-        dynamic_axes={
-            "images": {0: 'batch_size', 2: 'height', 3: 'width'},
-        },
-    )
-
     for recognition_model in recognition_models:
         print(f'Exporting {recognition_model}...')
         gen = 'gen1' if recognition_model.endswith('_g1') else 'gen2'
@@ -109,6 +93,21 @@ def main():
             },
         )
 
+    print('Exporting CRAFT...')
+    filename: str = config.detection_models['craft']['filename']
+    dummy_input = (torch.randn(1, 3, 2560, 2560),)
+    model = get_detector(os.path.join(model_dir, filename))
+    torch.onnx.export(
+        model,
+        dummy_input,
+        os.path.join(model_dir, filename.rsplit('.', 1)[0] + '.onnx'),
+        export_params=True,
+        input_names=('images',),
+        output_names=('y',),
+        dynamic_axes={
+            "images": {0: 'batch_size', 2: 'height', 3: 'width'},
+        },
+    )
 
 if __name__ == '__main__':
     main()
