@@ -89,6 +89,9 @@ def main():
             recog_network=recognition_model,
             quantize=False,
         )
+        # AdaptiveAvgPool2d cannot be exported to ONNX
+        # Specifying a static one instead assuming imgH=64
+        reader.recognizer.AdaptiveAvgPool = torch.nn.AvgPool2d((1, 3))
         dummy_input = (
             torch.randn(1, 1, 64, 512),
             torch.randn(1, 512),
